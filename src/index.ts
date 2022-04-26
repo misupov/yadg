@@ -1,7 +1,7 @@
 import { GridOptions } from "./types";
 import { YadgGrid } from "./yadgGrid";
 
-export * from './types';
+export * from "./types";
 
 export class Yadg {
   private root: HTMLElement;
