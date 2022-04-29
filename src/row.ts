@@ -9,13 +9,11 @@ export type Row = {
 };
 
 export function row(x: number): Row {
-  let index = x;
+  const index = x;
   let top = 0;
   let xx: HTMLDivElement;
   const children: HTMLDivElement[] = [];
-  children.push(
-    xx = div({ className: "cell", children: [text(x.toString())] }),
-  );
+  children.push((xx = div({ className: "cell", children: [text(x.toString())] })));
   for (let i = 0; i <= 200; i++) {
     children.push(div({ className: "cell", children: [text(i.toString())] }));
   }

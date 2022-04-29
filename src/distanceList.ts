@@ -66,10 +66,7 @@ function $ensureTreeLength<T>(node: Node<T>, measurer: Measurer<T>): number {
   return treeLength;
 }
 
-function $findNodeByIndex<T>(
-  node: Node<T>,
-  index: number,
-): Node<T> | undefined {
+function $findNodeByIndex<T>(node: Node<T>, index: number): Node<T> | undefined {
   if (!node.left) {
     if (index === 0) return node;
     if (!node.right) return undefined;
@@ -84,11 +81,7 @@ function $findNodeByIndex<T>(
   return $findNodeByIndex(node.right, index);
 }
 
-function $findNodeByDistance<T>(
-  node: Node<T>,
-  distance: number,
-  measurer: Measurer<T>,
-): Node<T> | undefined {
+function $findNodeByDistance<T>(node: Node<T>, distance: number, measurer: Measurer<T>): Node<T> | undefined {
   const length = $ensureNodeLength(node, measurer);
   if (!node.left) {
     if (distance < length) return node;
@@ -245,12 +238,7 @@ function $deleteNode<T>(node: Node<T>): Node<T> | undefined {
   return node;
 }
 
-function $getItemInfoByIndex<T>(
-  node: Node<T>,
-  index: number,
-  measurer: Measurer<T>,
-  result: Partial<ItemInfo<T>>,
-): ItemInfo<T> | undefined {
+function $getItemInfoByIndex<T>(node: Node<T>, index: number, measurer: Measurer<T>, result: Partial<ItemInfo<T>>): ItemInfo<T> | undefined {
   if (!node.left) {
     if (index === 0) {
       result.index = 0;
@@ -279,24 +267,14 @@ function $getItemInfoByIndex<T>(
     return result as ItemInfo<T>;
   }
   if (!node.right) return undefined;
-  const info = $getItemInfoByIndex(
-    node.right,
-    index - leftSubTreeSize - 1,
-    measurer,
-    result,
-  );
+  const info = $getItemInfoByIndex(node.right, index - leftSubTreeSize - 1, measurer, result);
   if (!info) return undefined;
   info.index += leftSubTreeSize + 1;
   info.outerDistance += $ensureTreeLength(node.left, measurer) + $ensureNodeLength(node, measurer);
   return info;
 }
 
-function $getItemInfoByDistance<T>(
-  node: Node<T>,
-  distance: number,
-  measurer: Measurer<T>,
-  result: Partial<ItemInfo<T>>,
-): ItemInfo<T> | undefined {
+function $getItemInfoByDistance<T>(node: Node<T>, distance: number, measurer: Measurer<T>, result: Partial<ItemInfo<T>>): ItemInfo<T> | undefined {
   const length = $ensureNodeLength(node, measurer);
   if (!node.left) {
     if (distance < length) {
@@ -308,12 +286,7 @@ function $getItemInfoByDistance<T>(
       return result as ItemInfo<T>;
     }
     if (!node.right) return undefined;
-    const info = $getItemInfoByDistance(
-      node.right,
-      distance - length,
-      measurer,
-      result,
-    );
+    const info = $getItemInfoByDistance(node.right, distance - length, measurer, result);
     if (!info) return undefined;
     info.index++;
     info.outerDistance += $ensureNodeLength(node, measurer);
@@ -331,12 +304,7 @@ function $getItemInfoByDistance<T>(
     return result as ItemInfo<T>;
   }
   if (!node.right) return undefined;
-  const info = $getItemInfoByDistance(
-    node.right,
-    distance - leftSubTreeLength - length,
-    measurer,
-    result,
-  );
+  const info = $getItemInfoByDistance(node.right, distance - leftSubTreeLength - length, measurer, result);
   if (!info) return undefined;
   info.index += $getTreeSize(node.left) + 1;
   info.outerDistance += leftSubTreeLength + length;

@@ -12,6 +12,8 @@ export class YadgGrid extends HTMLElement {
   rows: Row[] = [];
   rowHeight: number = 0;
   invisibleRows: Row[] = [];
+  map: any;
+  prevViewport?: { top: number; bottom: number };
 
   constructor() {
     super();
@@ -24,10 +26,10 @@ export class YadgGrid extends HTMLElement {
           (this.header = div({ className: "header" })),
           (this.viewport = div({
             className: "viewport",
-            children: [this.scrollPane = div({ className: "scrollPane" })],
-          }),
+            children: [(this.scrollPane = div({ className: "scrollPane" }))],
+          })),
         ],
-      }),
+      })
     );
     this.header.appendChild(text("567"));
     for (let i = 0; i < 60; i++) {
@@ -61,7 +63,7 @@ export class YadgGrid extends HTMLElement {
     const last = first + rowVisible;
     for (let i = 0; i < rowVisible; i++) {
       const r1 = this.map.get(first + i);
-      const r = this.invisibleRows.pop();
+      const r = this.invisibleRows.pop()!;
       r.update(i + first);
       r.setTop(i * this.rowHeight + Math.trunc(this.viewport.scrollTop / this.rowHeight) * this.rowHeight);
     }
@@ -104,13 +106,9 @@ export class YadgGrid extends HTMLElement {
       const headerStyle = { ...defaultHeaderStyle, ...header };
       this.styleSheet.sheet!.insertRule(`.header {${formatRule(headerStyle)}}`);
       const viewportStyle = { ...defaultViewportStyle, ...viewport };
-      this.styleSheet.sheet!.insertRule(
-        `.viewport {${formatRule(viewportStyle)}}`,
-      );
+      this.styleSheet.sheet!.insertRule(`.viewport {${formatRule(viewportStyle)}}`);
       const scrollPaneStyle = { ...defaultScrollPaneStyle, ...scrollPane };
-      this.styleSheet.sheet!.insertRule(
-        `.scrollPane {${formatRule(scrollPaneStyle)}}`,
-      );
+      this.styleSheet.sheet!.insertRule(`.scrollPane {${formatRule(scrollPaneStyle)}}`);
       this.styleSheet.sheet!.insertRule(`.row {display: flex; position: absolute;will-change:top}`);
       this.styleSheet.sheet!.insertRule(`.cell {width: 50px;flex-shrink:0}`);
     }
