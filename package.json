@@ -41,7 +41,10 @@
   "devDependencies": {
     "@size-limit/preset-small-lib": "^7.0.8",
     "dprint": "^0.27.0",
+    "eslint": "^8.14.0",
+    "eslint-config-airbnb-typescript-prettier": "^5.0.0",
     "husky": "^7.0.4",
+    "prettier": "^2.6.2",
     "size-limit": "^7.0.8",
     "tsdx": "^0.14.1",
     "tslib": "^2.4.0",

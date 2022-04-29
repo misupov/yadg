@@ -1,4 +1,5 @@
 import { div, formatRule, text } from "./dom";
+import { Row, row } from "./row";
 import { GridOptions } from "./types";
 
 export class YadgGrid extends HTMLElement {
@@ -8,6 +9,9 @@ export class YadgGrid extends HTMLElement {
   viewport: HTMLDivElement;
   gridOptions?: GridOptions;
   scrollPane: HTMLDivElement;
+  rows: Row[] = [];
+  rowHeight: number = 0;
+  invisibleRows: Row[] = [];
 
   constructor() {
     super();
@@ -17,15 +21,27 @@ export class YadgGrid extends HTMLElement {
       div({
         className: "grid",
         children: [
-          this.header = div({ className: "header" }),
-          this.viewport = div({
+          (this.header = div({ className: "header" })),
+          (this.viewport = div({
             className: "viewport",
-            children: [this.scrollPane = div({ className: "scrollPane", children: [text("1234567")] })],
+            children: [this.scrollPane = div({ className: "scrollPane" })],
           }),
         ],
       }),
     );
     this.header.appendChild(text("567"));
+    for (let i = 0; i < 60; i++) {
+      const r = row(i);
+      r.setTop(-10000);
+      this.rows.push(r);
+      this.scrollPane.appendChild(r.gui);
+      this.invisibleRows.push(r);
+    }
+    this.viewport.onscroll = (e) => {
+      // requestAnimationFrame(() => {
+      this.redraw();
+      // })
+    };
   }
 
   setOptions(options: GridOptions) {
@@ -34,6 +50,26 @@ export class YadgGrid extends HTMLElement {
 
   connectedCallback() {
     this.updateStyles();
+
+    this.rowHeight = this.rows[0].gui.getBoundingClientRect().height;
+    this.redraw();
+  }
+
+  private redraw() {
+    const rowVisible = Math.ceil(this.viewport.clientHeight / this.rowHeight);
+    const first = Math.trunc(this.viewport.scrollTop / this.rowHeight);
+    const last = first + rowVisible;
+    for (let i = 0; i < rowVisible; i++) {
+      const r1 = this.map.get(first + i);
+      const r = this.invisibleRows.pop();
+      r.update(i + first);
+      r.setTop(i * this.rowHeight + Math.trunc(this.viewport.scrollTop / this.rowHeight) * this.rowHeight);
+    }
+    this.prevViewport = {
+      top: this.viewport.scrollTop,
+      bottom: this.viewport.scrollTop + this.scrollPane.clientHeight,
+    };
+    this.scrollPane.style.height = 500000 + "px";
   }
 
   private updateStyles() {
@@ -59,7 +95,8 @@ export class YadgGrid extends HTMLElement {
       const defaultScrollPaneStyle: Partial<CSSStyleDeclaration> = {
         flexGrow: "1",
         width: "500px",
-        height: "50000px",
+        height: "500px",
+        position: "relative",
       };
       const gridStyle = { ...defaultGridStyle, ...theme };
       this.styleSheet.sheet!.insertRule(`.grid {${formatRule(gridStyle)}}`);
@@ -74,6 +111,8 @@ export class YadgGrid extends HTMLElement {
       this.styleSheet.sheet!.insertRule(
         `.scrollPane {${formatRule(scrollPaneStyle)}}`,
       );
+      this.styleSheet.sheet!.insertRule(`.row {display: flex; position: absolute;will-change:top}`);
+      this.styleSheet.sheet!.insertRule(`.cell {width: 50px;flex-shrink:0}`);
     }
   }
 }
